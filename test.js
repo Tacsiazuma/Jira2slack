@@ -3,7 +3,7 @@
  */
 var assert = require('assert');
 
-var bot = require("./index.js").core();
+var bot = require("./jirahook.js").core();
 var expect = require("chai").expect;
 var http = require("http");
 
