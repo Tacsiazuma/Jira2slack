@@ -14,7 +14,7 @@ SLACK.core = function(options) {
     this.data = ""; // initial data string
     this.options = options;
     this.options.url = "slack.com";
-    response = this.rtmStart(options.token);
+    this.rtmStart();
 
 
 };
@@ -23,26 +23,61 @@ SLACK.user = function(name, realname, id) {
     this.name = name;
     this.realname = realname;
     this.id = id;
+    this.channel;
 }
 
 
+
+
+/**
+ * Opens an instant message channel
+ * @param options
+ */
 SLACK.core.prototype.imOpen = function(options) {
 
 }
-
+/**
+ * Starts a real time message session.
+ * @param token
+ */
 SLACK.core.prototype.rtmStart = function(token) {
-    this.sendRequest(this.options.url, {
+    this.sendRequest(this.options.url, "/api/rtm.start", {
         token: token
-    } )
+    })
+}
+/**
+ * Posts a message to a given channel
+ * @param options
+ */
+SLACK.core.prototype.postMessage = function(user, text) {
+    channel =  this.getMappedChannel(user);
+    this.sendRequest(this.options.url, "/api/chat.postMessage", {
+        channel : channel,
+        text : text,
+        as_user : true,
+        token : this.options.token
+    })
+
 }
 
-SLACK.core.prototype.postMessage = function(options) {
 
+SLACK.core.prototype.getMappedChannel = function(user) {
+    var channel = "";
+    this.users.forEach(function(elem, index) {
+        if (elem.name == user) {
+            channel = elem.channel;
+        }
+    });
+    return channel;
 }
-
+/**
+ * Assign channels to users
+ */
 SLACK.core.prototype.assignChannels = function() {
     var self = this;
+
     this.users.forEach(function(elem, index) {
+
         var user = elem;
         self.responseJSON.ims.forEach(function(elem, index){
             if (elem.user == user.id) {
@@ -51,7 +86,9 @@ SLACK.core.prototype.assignChannels = function() {
         });
     });
 }
-
+/**
+ *
+ */
 SLACK.core.prototype.parse = function() {
     var self = this;
     this.responseJSON = JSON.parse(this.data.toString());
@@ -60,8 +97,6 @@ SLACK.core.prototype.parse = function() {
                 self.users.push(new SLACK.user(elem.name, elem.real_name, elem.id));
             })
         this.assignChannels();
-        console.log(this.users);
-        process.exit();
     }
 
 }
@@ -74,7 +109,7 @@ SLACK.core.prototype.appendData = function (chunk) {
 SLACK.core.prototype.handleResponse = function (res) {
     var self = this;
     res.setEncoding('utf8');
-
+    self.data = ""; // empty the buffer
     res.on('data', function(chunk) {
         self.appendData(chunk)
     });
@@ -86,12 +121,12 @@ SLACK.core.prototype.handleResponse = function (res) {
 
 };
 
-SLACK.core.prototype.sendRequest = function(url, postData) {
+SLACK.core.prototype.sendRequest = function(url,path, postData) {
     var self = this;
     post = querystring.stringify(postData);
     var req = SLACK.request({
         host: url,
-        path: "/api/rtm.start",
+        path: path,
         method: "POST",
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -99,7 +134,9 @@ SLACK.core.prototype.sendRequest = function(url, postData) {
         }
 
     },function(res) {
-            self.handleResponse(res);
+            if (path == "/api/rtm.start") {
+                self.handleResponse(res);
+            }
         }
     );
     // add error handling
