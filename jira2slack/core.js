@@ -30,11 +30,16 @@ jira2slack.core = function(options) {
             managers: { // manager related notifications
                 worklogs: true,
                 issues: false,
-                worklogTemplate : ""
+                pattern : "00 00 08 * * 1-5", // the cronjob pattern
+                worklogTemplate : "",
+                notificationLimit : 6*3600
             },
             users: { // user related notifications
+                pattern: "00 00 18 * * 1-5",  // the cronjob pattern
                 worklogs: false,
-                issues: false
+                issues: false,
+                worklogTemplate : "",
+                notificationLimit : 6*3600 // if the daily worklogs pass these number then no warning gonna be send
             }
         },
         // webhook related options
@@ -56,7 +61,7 @@ jira2slack.core = function(options) {
     this.options.url = "slack.com";
     this.hook = new jira2slack.hook(this.options.hook, this); // start the hook service by passing the related configurations and the core object reference to it
     this.webinterface = new jira2slack.web(this.options.webinterface,this ); // start the webinterface service
-    this.cron = new jira2slack.cron(this.options.notifications);
+    this.cron = new jira2slack.cron(this.options.notifications, this);
 };
 
 jira2slack.core.prototype.start = function() {
