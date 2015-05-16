@@ -23,6 +23,19 @@ jira2slack.notificationservice.prototype.start = function() {
             self.sendSlackerNotification();
         }, null, true);
     }
+    new cronjob("0 0 0 * * *", function () {
+        self.resetWorkLogs();
+    }, null, true);
+
+}
+/**
+ * Reset the daily worklogs
+ */
+jira2slack.notificationservice.prototype.resetWorkLogs = function() {
+    var core = this.core;
+    core.users.forEach(function(elem, index) {
+        elem.worklog = 0;
+    });
 }
 
 
@@ -32,7 +45,7 @@ jira2slack.notificationservice.prototype.sendSlackerNotification = function() {
     core.users.forEach(function(elem, index) {
         if (elem.worklog == undefined) elem.worklog = 0; // if no worklog has been assigned
         if (elem.worklog < (6*3600)) {
-            text = self.generateMessageFromTemplate(elem, core.options.users.worklogTemplate); //"*" + elem.name + "* csak *" + createTime(elem.worklog) + "*-t logoltál!";
+            text = self.generateMessageFromTemplate(elem, core.options.users.worklogTemplate);
             core.postMessage(elem.slackname, text);
         }
     });
@@ -45,7 +58,7 @@ jira2slack.notificationservice.prototype.sendManagerNotification = function() {
     core.users.forEach(function(elem, index) {
         if (elem.worklog == undefined) elem.worklog = 0;
         if (elem.worklog < (6*3600)) {
-            text = "*" + elem.name + "* csak *" + createTime(elem.worklog) + "*-t logoltál!";
+            text = self.generateMessageFromTemplate(elem, core.options.managers.worklogTemplate);
             core.postMessage(elem.slackname, text);
         }
     });
