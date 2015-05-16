@@ -13,23 +13,64 @@ jira2slack.notificationservice = function(options, core) {
 jira2slack.notificationservice.prototype.start = function() {
     console.log("Notification service started!");
     var self = this;
-    new cronjob("* * * * * *", function() {
-        self.sendSlackerNotification();
-    }, null, true);
+    if (self.options.managers.worklogs == true) {
+        new cronjob(self.options.managers.pattern, function () {
+            self.sendManagerNotification();
+        }, null, true);
+    }
+    if (self.options.users.worklogs == true) {
+        new cronjob(self.options.users.pattern, function () {
+            self.sendSlackerNotification();
+        }, null, true);
+    }
 }
 
 
 jira2slack.notificationservice.prototype.sendSlackerNotification = function() {
     var core = this.core;
+    var self = this;
     core.users.forEach(function(elem, index) {
-        if (elem.worklog == undefined) elem.worklog = 0;
+        if (elem.worklog == undefined) elem.worklog = 0; // if no worklog has been assigned
         if (elem.worklog < (6*3600)) {
-            text = "*" + elem.name + "* csak *" + ERISE.createTime(elem.worklog) + "*-t logoltál!";
+            text = self.generateMessageFromTemplate(elem, core.options.users.worklogTemplate); //"*" + elem.name + "* csak *" + createTime(elem.worklog) + "*-t logoltál!";
             core.postMessage(elem.slackname, text);
         }
     });
 };
 
 
+jira2slack.notificationservice.prototype.sendManagerNotification = function() {
+    var core = this.core;
+    var self = this;
+    core.users.forEach(function(elem, index) {
+        if (elem.worklog == undefined) elem.worklog = 0;
+        if (elem.worklog < (6*3600)) {
+            text = "*" + elem.name + "* csak *" + createTime(elem.worklog) + "*-t logoltál!";
+            core.postMessage(elem.slackname, text);
+        }
+    });
+}
+
+/**
+ * Generates a worklog related message by the given template
+ * @param user
+ */
+jira2slack.notificationservice.prototype.generateMessageFromTemplate = function(user, template) {
+
+}
+
+
+function createTime(time) {
+    var sec_num = parseInt(time, 10); // don't forget the second param
+    var hours   = Math.floor(sec_num / 3600);
+    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+    if (hours   < 10) {hours   = "0"+hours;}
+    if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+    var time    = hours+':'+minutes+':'+seconds;
+    return time;
+}
 
 module.exports.cron = jira2slack.notificationservice;
