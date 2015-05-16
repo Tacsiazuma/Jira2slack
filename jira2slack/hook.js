@@ -79,10 +79,6 @@ jira2slack.hook.prototype.issueCreated = function(content) {
 jira2slack.hook.prototype.issueUpdated = function(content) {
 
 }
-jira2slack.hook.prototype.generateWorkLogMessage = function(content) {
-    text = content.user.name + " " + ERISE.createTime(content.issue.fields.timespent) + " másodpercet baszott el marhaságokra.";
-    return text;
-}
 
 jira2slack.hook.prototype.createTime = function(time) {
     var sec_num = parseInt(time, 10); // don't forget the second param

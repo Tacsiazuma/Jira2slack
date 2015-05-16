@@ -20,11 +20,12 @@ jira2slack.notificationservice.prototype.start = function() {
 
 
 jira2slack.notificationservice.prototype.sendSlackerNotification = function() {
-    ERISE.users.forEach(function(elem, index) {
+    var core = this.core;
+    core.users.forEach(function(elem, index) {
         if (elem.worklog == undefined) elem.worklog = 0;
         if (elem.worklog < (6*3600)) {
             text = "*" + elem.name + "* csak *" + ERISE.createTime(elem.worklog) + "*-t logoltál!";
-            slackstuff.postMessage(elem.slackname, text);
+            core.postMessage(elem.slackname, text);
         }
     });
 };
