@@ -65,6 +65,7 @@ jira2slack.core = function(options) {
     };
     this.options = MergeRecursive(this.options,options); // merge the options
     this.users = this.options.users; // assign the users from options
+    this.managers = this.options.managers;
     this.options.url = "slack.com";
     this.translate = new jira2slack.translate(this.options.locale);
     if (this.options.hook.enabled == true) {
@@ -133,7 +134,11 @@ jira2slack.core.prototype.postMessage = function(user, text, attachments) {
 
 }
 
-
+/**
+ * Get the channel associated with the given user
+ * @param user
+ * @returns {string}
+ */
 jira2slack.core.prototype.getMappedChannel = function(user) {
     var channel = "";
     this.users.forEach(function(elem, index) {
@@ -148,9 +153,30 @@ jira2slack.core.prototype.getMappedChannel = function(user) {
  */
 jira2slack.core.prototype.assignChannels = function() {
     var self = this;
-    this.users.forEach(function(elem, index) {
-
+    this.users.forEach(function(elem) {
         var user = elem;
+        self.responseJSON.users.forEach(function(elem) {
+            if (elem.name == user.slackname) {
+                user.realname = elem.realname;
+                user.id = elem.id; // assign the ID
+            }
+        })
+
+        self.responseJSON.ims.forEach(function(elem, index){
+            if (elem.user == user.id) {
+                user.channel = elem.id;
+            }
+        });
+    });
+    this.managers.forEach(function(elem) {
+        var user = elem;
+        self.responseJSON.users.forEach(function(elem) {
+            if (elem.name == user.slackname) {
+                user.realname = elem.realname;
+                user.id = elem.id; // assign the ID
+            }
+        })
+
         self.responseJSON.ims.forEach(function(elem, index){
             if (elem.user == user.id) {
                 user.channel = elem.id;
@@ -165,9 +191,6 @@ jira2slack.core.prototype.parse = function() {
     var self = this;
     this.responseJSON = JSON.parse(this.data.toString());
     if (this.responseJSON.ok == true) { // if the response went fine then iterate through the ims and map them to users
-        this.responseJSON.users.forEach(function(elem, index) {
-            self.users.push(new jira2slack.user(elem.name, elem.real_name, elem.id));
-        })
         this.assignChannels(); // assign channels to users
         this.url = this.responseJSON.url; // assign the real time messaging websocket url
         process.stdout.write("success!\n".green);
