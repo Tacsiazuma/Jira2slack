@@ -66,6 +66,7 @@ jira2slack.core = function(options) {
     this.options = MergeRecursive(this.options,options); // merge the options
     this.users = this.options.users; // assign the users from options
     this.options.url = "slack.com";
+    this.translate = new jira2slack.translate(this.options.locale);
     if (this.options.hook.enabled == true) {
         this.hook = new jira2slack.hook(this.options.hook, this); // start the hook service by passing the related configurations and the core object reference to it
     }

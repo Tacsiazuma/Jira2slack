@@ -4,8 +4,8 @@
 
 lang = [
     {
-        key: "",
-        value : ""
+        key: "yes",
+        value : "igen"
     }
 ]
 
