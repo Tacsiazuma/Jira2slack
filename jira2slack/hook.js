@@ -12,13 +12,18 @@ jira2slack.hook = function(options, core) {
     this.core = core;
 }
 
+jira2slack.hook.prototype.__ = function(key) {
+    return this.core.translate.translate(key);
+}
+
+
 /**
  * Starts the http server listening to jira webhooks
  */
 
 jira2slack.hook.prototype.start = function() {
     var self = this;
-    console.log("Starting webhook at http://localhost:" + this.options.port);
+    console.log(this.__("Starting webhook at") + " http://localhost:" + this.options.port);
     // start listening for incoming JIRA hooks
     http.createServer(function(req, resp) {
         // register a callback for
@@ -78,7 +83,7 @@ jira2slack.hook.prototype.issueCreated = function(content) {
     if (this.options.issues == true) {
         if (content.user.name !== content.issue.fields.assignee.name) { // if the creator and the assignee are not the same person
             text = this.generateIssueCreateMessage(content.issue);
-            attachments = this.generateIssueCreateAttachments(content.issue)
+            attachments = this.generateIssueCreateAttachments(content.issue);
             this.core.postMessage(content.issue.fields.assignee.name, text, attachments); //
         }
     }
@@ -143,31 +148,60 @@ jira2slack.hook.prototype.generateIssueCreateMessage = function(issue) {
 jira2slack.hook.prototype.generateIssueCreateAttachments = function(issue) {
     attachments = [
         {
-            "fallback": issue.fields.creator.name + " : https://honeybadger.io/path/to/event/",
-            "text": "<https://honeybadger.io/path/to/event/|ReferenceError> - UI is not defined",
+            "fallback": "*" +issue.fields.creator.name +"* " + this.__("issue_create") + " : <https://" +this.options.jiraurl+ "/browse/" + issue.key + "|"+ issue.key +">" ,
+            "pretext": issue.fields.creator.name + " " + this.__("issue_create") + " : <https://" +this.options.jiraurl+ "/browse/" + issue.key + "|"+ issue.key +">" ,
             "fields": [
                 {
-                    "title": "Project",
-                    "value": "Awesome Project",
+                    "title": this.__("Summary"),
+                    "value": issue.fields.summary,
                     "short": true
                 },
                 {
-                    "title": "Environment",
-                    "value": "production",
+                    "title": this.__("Estimate"),
+                    "value": issue.fields.timetracking.originalEstimate,
                     "short": true
+                },
+                {
+                    "title": this.__("Description"),
+                    "value": issue.fields.description,
+                    "short": false
                 }
             ],
-            "color": "#F35A00"
+            "color": "warning"
         }
     ];
 
+    return attachments;
 }
 
 
 jira2slack.hook.prototype.generateIssueUpdateAttachments = function(issue) {
-    attachments = [];
+    attachments = [
+        {
+            "fallback": "*" +issue.fields.creator.name +"* " + this.__("issue_create") + " : <https://" +this.options.jiraurl+ "/browse/" + issue.key + "|"+ issue.key +">" ,
+            "pretext": issue.fields.creator.name + " " + this.__("issue_create") + " : <https://" +this.options.jiraurl+ "/browse/" + issue.key + "|"+ issue.key +">" ,
+            "fields": [
+                {
+                    "title": this.__("Summary"),
+                    "value": issue.fields.summary,
+                    "short": true
+                },
+                {
+                    "title": this.__("Estimate"),
+                    "value": issue.fields.timetracking.originalEstimate,
+                    "short": true
+                },
+                {
+                    "title": this.__("Description"),
+                    "value": issue.fields.description,
+                    "short": false
+                }
+            ],
+            "color": "warning"
+        }
+    ];
 
-
+    return attachments;
 }
 
 

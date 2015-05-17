@@ -122,14 +122,13 @@ jira2slack.core.prototype.rtmStart = function() {
  * @param options
  */
 jira2slack.core.prototype.postMessage = function(user, text, attachments) {
-    attachments = attachments || [];
     channel =  this.getMappedChannel(user);
     this.sendRequest(this.options.url, "/api/chat.postMessage", {
         channel : channel,
-        text : text,
+        username : "JIRA",
         as_user : true,
         token : this.options.token,
-        attachments : attachments
+        attachments : JSON.stringify(attachments) // we must json_encode it
     })
 
 }
