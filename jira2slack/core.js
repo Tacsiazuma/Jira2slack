@@ -12,6 +12,8 @@ jira2slack.hook = require("./hook").hook;
 
 jira2slack.cron = require("./cron").cron;
 
+jira2slack.translate = require("./translate").translate;
+
 jira2slack.web = require("./webinterface").web;
 
 querystring = require("querystring");
@@ -90,7 +92,12 @@ jira2slack.core.prototype.start = function() {
     this.rtmStart(this.options.token);
 }
 
-
+/**
+ * A user entity
+ * @param name
+ * @param realname
+ * @param id
+ */
 jira2slack.user = function(name, realname, id) {
     this.name = name;
     this.realname = realname;
@@ -109,27 +116,19 @@ jira2slack.core.prototype.rtmStart = function() {
     })
 }
 
-
-/**
- * Opens an instant message channel
- * @param options
- */
-jira2slack.core.prototype.imOpen = function(options) {
-
-}
-
 /**
  * Posts a message to a given channel
  * @param options
  */
-jira2slack.core.prototype.postMessage = function(user, text) {
-
+jira2slack.core.prototype.postMessage = function(user, text, attachments) {
+    attachments = attachments || [];
     channel =  this.getMappedChannel(user);
     this.sendRequest(this.options.url, "/api/chat.postMessage", {
         channel : channel,
         text : text,
         as_user : true,
-        token : this.options.token
+        token : this.options.token,
+        attachments : attachments
     })
 
 }
@@ -160,7 +159,7 @@ jira2slack.core.prototype.assignChannels = function() {
     });
 }
 /**
- *
+ * Parse a real time messaging session response
  */
 jira2slack.core.prototype.parse = function() {
     var self = this;
@@ -171,15 +170,15 @@ jira2slack.core.prototype.parse = function() {
         })
         this.assignChannels(); // assign channels to users
         this.url = this.responseJSON.url; // assign the real time messaging websocket url
-        process.stdout.write("success!".green);
+        process.stdout.write("success!\n".green);
     } else {
-        process.stdout.write("failed!".red);
+        process.stdout.write("failed!\n".red);
         process.exit();
     }
 
 }
 
-/*
+/**
  * Recursively merge properties of two objects (options)
  */
 function MergeRecursive(obj1, obj2) {

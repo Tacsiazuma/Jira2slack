@@ -24,6 +24,7 @@ jira2slack.notificationservice.prototype.start = function() {
         }, null, true);
     }
     new cronjob("0 0 0 * * *", function () {
+        self.generateManagerMessage(); // generates the message to the managers
         self.resetWorkLogs();
     }, null, true);
 
@@ -55,13 +56,16 @@ jira2slack.notificationservice.prototype.sendSlackerNotification = function() {
 jira2slack.notificationservice.prototype.sendManagerNotification = function() {
     var core = this.core;
     var self = this;
+    riportText = "";
     core.users.forEach(function(elem, index) {
         if (elem.worklog == undefined) elem.worklog = 0;
         if (elem.worklog < (6*3600)) {
-            text = self.generateMessageFromTemplate(elem, core.options.managers.worklogTemplate);
-            core.postMessage(elem.slackname, text);
+            riportText += self.generateMessageFromTemplate(elem, core.options.managers.worklogTemplate);
         }
     });
+    core.managers.forEach(function(elem, index) { //
+        core.postMessage(elem.slackname, riportText);
+    })
 }
 
 /**

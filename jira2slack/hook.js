@@ -5,6 +5,8 @@ var jira2slack = {};
 
 var http = require("http");
 
+
+
 jira2slack.hook = function(options, core) {
     this.options = options;
     this.core = core;
@@ -76,7 +78,8 @@ jira2slack.hook.prototype.issueCreated = function(content) {
     if (this.options.issues == true) {
         if (content.user.name !== content.issue.fields.assignee.name) { // if the creator and the assignee are not the same person
             text = this.generateIssueCreateMessage(content.issue);
-            this.core.postMessage(content.issue.fields.assignee.name, text); //
+            attachments = this.generateIssueCreateAttachments(content.issue)
+            this.core.postMessage(content.issue.fields.assignee.name, text, attachments); //
         }
     }
 }
@@ -89,7 +92,8 @@ jira2slack.hook.prototype.issueUpdated = function(content) {
     if (this.options.issues == true) {
         if (content.user.name !== content.issue.fields.assignee.name) { // if the creator and the assignee are not the same person
             text = this.generateIssueUpdateMessage(content.issue);
-            this.core.postMessage(content.issue.fields.assignee.name, text); //
+            attachments = this.generateIssueUpdateAttachments(content.issue)
+            this.core.postMessage(content.issue.fields.assignee.name, text, attachments); //
         }
     }
 }
@@ -134,6 +138,38 @@ jira2slack.hook.prototype.generateIssueCreateMessage = function(issue) {
         replace(/%estimate%/g, issue.fields.timetracking.originalEstimate );
     return text;
 }
+
+
+jira2slack.hook.prototype.generateIssueCreateAttachments = function(issue) {
+    attachments = [
+        {
+            "fallback": issue.fields.creator.name + " : https://honeybadger.io/path/to/event/",
+            "text": "<https://honeybadger.io/path/to/event/|ReferenceError> - UI is not defined",
+            "fields": [
+                {
+                    "title": "Project",
+                    "value": "Awesome Project",
+                    "short": true
+                },
+                {
+                    "title": "Environment",
+                    "value": "production",
+                    "short": true
+                }
+            ],
+            "color": "#F35A00"
+        }
+    ];
+
+}
+
+
+jira2slack.hook.prototype.generateIssueUpdateAttachments = function(issue) {
+    attachments = [];
+
+
+}
+
 
 /**
  * Export block
