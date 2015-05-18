@@ -52,8 +52,6 @@ jira2slack.core = function(options) {
             port: 3000,
             worklogs: true,
             issues: true,
-            issueCreateTemplate: "*%creator%* kiírta neked a(z) <https://%url%/browse/%key%|%key%> %type%-t:\n%description%\n Esztimált idő: %estimate%",
-            issueUpdateTemplate: "*%creator%* updatelte a(z) <https://%url%/browse/%key%|%key%> %type%-t:\n%description%\n Esztimált idő: %estimate%"
         },
         webinterface : {
             enabled : false,
