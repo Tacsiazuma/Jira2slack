@@ -55,7 +55,7 @@ jira2slack.core = function(options) {
         },
         webinterface : {
             enabled : true,
-            port: 8080,
+            port: 8081,
             username: "Tacsiazuma",
             password: "test"
         }
@@ -122,6 +122,7 @@ jira2slack.core.prototype.rtmStart = function() {
  */
 jira2slack.core.prototype.postMessage = function(user, text, attachments) {
     channel =  this.getMappedChannel(user);
+    console.log("Sent message to user " + user + " at channel:" + channel)
     this.sendRequest(this.options.url, "/api/chat.postMessage", {
         channel : channel,
         username : "JIRA",

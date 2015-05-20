@@ -94,7 +94,7 @@ jira2slack.hook.prototype.commitWorkLog = function(content) {
             content.changelog.items.forEach(function(elem) {
                 if (elem.field == "timespent") {
                     if (elem.from == undefined) elem.from = 0;
-                    user.worklog += elem.from - elem.to;
+                    user.worklog += (elem.to - elem.from);
                 }
             });
 
@@ -126,6 +126,12 @@ jira2slack.hook.prototype.issueUpdated = function(content) {
         if (content.user.name !== content.issue.fields.assignee.name) { // if the creator and the assignee are not the same person
             attachments = this.generateIssueUpdateAttachments(content.issue, content.changelog, content.user)
             this.core.postMessage(content.issue.fields.assignee.name, "", attachments); //
+        } else if (content.user.name !== content.issue.fields.creator.name) {
+            attachments = this.generateIssueUpdateAttachments(content.issue, content.changelog, content.user)
+            this.core.postMessage(content.issue.fields.creator.name, "", attachments);
+        } else if (content.user.name !== content.issue.fields.reporter.name) {
+            attachments = this.generateIssueUpdateAttachments(content.issue, content.changelog, content.user)
+            this.core.postMessage(content.issue.fields.reporter.name, "", attachments);
         }
     }
 }
@@ -137,8 +143,8 @@ jira2slack.hook.prototype.issueUpdated = function(content) {
 jira2slack.hook.prototype.generateIssueCreateAttachments = function(issue, user) {
     attachments = [
         {
-            "fallback": "*" +user.displayName +"* " + this.__("issue_create") + " : <https://" +this.options.jiraurl+ "/browse/" + issue.key + "|"+ issue.key +">" ,
-            "pretext": user.displayName + " " + this.__("issue_create") + " : <https://" +this.options.jiraurl+ "/browse/" + issue.key + "|"+ issue.key +">" ,
+            "fallback": "*" +user.displayName +"* " + this.__("issue_create") + " : <http://" +this.options.jiraurl+ "/browse/" + issue.key + "|"+ issue.key +">" ,
+            "pretext": user.displayName + " " + this.__("issue_create") + " : <http://" +this.options.jiraurl+ "/browse/" + issue.key + "|"+ issue.key +">" ,
             "fields": [
                 {
                     "title": this.__("Summary"),
