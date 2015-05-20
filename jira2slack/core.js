@@ -54,7 +54,7 @@ jira2slack.core = function(options) {
             issues: true,
         },
         webinterface : {
-            enabled : false,
+            enabled : true,
             port: 8080,
             username: "Tacsiazuma",
             password: "test"
