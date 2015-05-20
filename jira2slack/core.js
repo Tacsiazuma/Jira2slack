@@ -3,7 +3,7 @@
  */
 
 var jira2slack = jira2slack || {};
-
+var fs = require("fs");
 var colors = require("colors");
 
 jira2slack.request = require("https").request;
@@ -17,6 +17,12 @@ jira2slack.translate = require("./translate").translate;
 jira2slack.web = require("./webinterface").web;
 
 querystring = require("querystring");
+
+process.on("exit", function(code) {
+// make sure we delete template files on exit
+        fs.unlinkSync("./jira2slack/tmp/users.json");
+
+})
 
 
 jira2slack.core = function(options) {
@@ -63,6 +69,16 @@ jira2slack.core = function(options) {
     };
     this.options = MergeRecursive(this.options,options); // merge the options
     this.users = this.options.users; // assign the users from options
+    fs.exists("./jira2slack/tmp/users.json", function(ex) {
+            if (ex !== true) {
+                filedesc = fs.openSync("./jira2slack/tmp/users.json", 'w');
+                fs.writeSync(filedesc, JSON.stringify(self.users)); // save the users initially
+            } else {
+                content = fs.readFileSync("./jira2slack/tmp/users.json", {encoding : "UTF-8"});
+                self.users = JSON.parse(content);
+            }
+        });
+
     this.managers = this.options.managers;
     this.options.url = "slack.com";
     this.translate = new jira2slack.translate(this.options.locale);

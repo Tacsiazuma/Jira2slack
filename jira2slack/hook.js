@@ -5,7 +5,7 @@ var jira2slack = {};
 
 var http = require("http");
 
-
+var fs = require("fs");
 
 jira2slack.hook = function(options, core) {
     this.options = options;
@@ -86,11 +86,13 @@ jira2slack.hook.prototype.parse = function() {
  * @param content
  */
 jira2slack.hook.prototype.commitWorkLog = function(content) {
-    console.log(content.issue.fields.timespent);
-    this.core.users.forEach(function(elem) {
+    filecontent = fs.readFileSync("./jira2slack/tmp/users.json", {encoding : "UTF-8"});
+    users = JSON.parse(filecontent);
+    users.forEach(function(elem) {
 
         if (elem.name == content.user.name) {
             var user = elem;
+            if (user.worklog == undefined) user.worklog = 0;
             content.changelog.items.forEach(function(elem) {
                 if (elem.field == "timespent") {
                     if (elem.from == undefined) elem.from = 0;
@@ -100,6 +102,8 @@ jira2slack.hook.prototype.commitWorkLog = function(content) {
 
         }
     });
+    filedesc = fs.openSync("./jira2slack/tmp/users.json", 'w');
+    fs.writeSync(filedesc, JSON.stringify(users));
 }
 
 /**

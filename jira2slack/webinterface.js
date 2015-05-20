@@ -48,10 +48,11 @@ jira2slack.webinterface.prototype.start = function() {
             head = "";
             body = "";
 
-
+            content = fs.readFileSync("./jira2slack/tmp/users.json", {encoding : "UTF-8"});
+            usersarray = JSON.parse(content);
             var users = "<tr><th>" + self.__("Name") + "</th><th>" + self.__("Slackname") + "</th><th>" + self.__("Worklog") + "</th></tr>";
 
-            self.core.users.forEach(function (elem) {
+            usersarray.forEach(function (elem) {
                 if (elem.worklog == undefined) elem.worklog = 0;
                 users += "<tr><td>" + elem.name + "</td><td>" + elem.slackname + "</td><td>" + createTime(elem.worklog) + "</td></tr>";
             });
