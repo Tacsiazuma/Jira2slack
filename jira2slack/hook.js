@@ -87,10 +87,17 @@ jira2slack.hook.prototype.parse = function() {
  */
 jira2slack.hook.prototype.commitWorkLog = function(content) {
     console.log(content.issue.fields.timespent);
-    this.core.users.forEach(function(elem, index) {
+    this.core.users.forEach(function(elem) {
 
         if (elem.name == content.user.name) {
-            elem.worklog += content.issue.fields.timespent;
+            var user = elem;
+            content.changelog.items.forEach(function(elem) {
+                if (elem.field == "timespent") {
+                    if (elem.from == undefined) elem.from = 0;
+                    user.worklog += elem.from - elem.to;
+                }
+            });
+
         }
     });
 }
