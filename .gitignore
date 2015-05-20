@@ -6,7 +6,6 @@ Vagrantfile
 proxy.js
 routes
 views
-public
 cookbooks
 bin
 app
@@ -16,7 +15,6 @@ node_modules/cookie-parser
 node_modules/serve-favicon
 node_modules/body-parser
 node_modules/debug
-node_modules/jade
 node_modules/ws
 node_modules/nodejs-websocket
 node_modules/morgan

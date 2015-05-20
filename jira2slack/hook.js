@@ -86,6 +86,7 @@ jira2slack.hook.prototype.parse = function() {
  * @param content
  */
 jira2slack.hook.prototype.commitWorkLog = function(content) {
+    console.log(content.issue.fields.timespent);
     this.core.users.forEach(function(elem, index) {
 
         if (elem.name == content.user.name) {

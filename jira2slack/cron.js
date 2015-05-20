@@ -19,7 +19,7 @@ jira2slack.notificationservice.prototype.start = function() {
     console.log("Notification service started!");
     var self = this;
     if (self.options.managers.worklogs == true) {
-        new cronjob("5 * * * * *", function () { // self.options.managers.pattern
+        new cronjob(self.options.managers.pattern, function () { // self.options.managers.pattern
             self.sendManagerNotification();
         }, null, true);
     }

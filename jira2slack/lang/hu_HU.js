@@ -54,6 +54,18 @@ lang = [
     {
         key: "Daily report",
         value : "Napi riport"
+    },
+    {
+        key: "Worklog",
+        value : "Riportált idő"
+    },
+    {
+        key: "Managers",
+        value : "Menedzserek"
+    },
+    {
+        key: "Users",
+        value : "Fejlesztők"
     }
 ]
 
