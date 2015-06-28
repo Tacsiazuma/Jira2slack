@@ -13,7 +13,9 @@ Second, it collects the daily worklogs and inform users/managers about of shortc
 
 Third it provides a web interface for runtime configuration.
 
+ezt gyuri írta bele
 
+blablablaHZS
 
 +1sör
-blablablaHZS
+
