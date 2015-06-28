@@ -1,5 +1,7 @@
 JIRA2Slack
 
+Blablabla546465465465465
+
 This is a jira/slack integration workaround.
 
 It consists of three parts.
@@ -13,3 +15,6 @@ Third it provides a web interface for runtime configuration.
 ezt gyuri írta bele
 
 blablablaHZS
+
++1sör
+
