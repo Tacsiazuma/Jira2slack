@@ -9,3 +9,5 @@ First, it listens to jira webhooks on the given port and forwards them to the re
 Second, it collects the daily worklogs and inform users/managers about of shortcomings.
 
 Third it provides a web interface for runtime configuration.
+
+blablablaHZS
