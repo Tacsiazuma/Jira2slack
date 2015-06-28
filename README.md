@@ -1,4 +1,4 @@
-JIRA2Slack
+JIRA2Slack forked
 
 This is a jira/slack integration workaround.
 
