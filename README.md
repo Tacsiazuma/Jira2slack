@@ -2,6 +2,7 @@ JIRA2Slack
 
 Blabla
 
+
 This is a jira/slack integration workaround.
 
 It consists of three parts.
@@ -12,4 +13,7 @@ Second, it collects the daily worklogs and inform users/managers about of shortc
 
 Third it provides a web interface for runtime configuration.
 
+
+
++1sör
 blablablaHZS
